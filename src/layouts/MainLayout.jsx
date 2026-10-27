@@ -4,12 +4,14 @@ import Home from '../pages/Home';
 
 const MainLayout = () => {
   return (
-    <section className="main">
-        <NavBar />
+    <section className="main min-h-screen w-full max-w-full overflow-x-hidden flex flex-col">
+      <NavBar />
+      <main className="flex-1 w-full bg-base-300">
         <Home />
-        <Footer />
+      </main>
+      <Footer />
     </section>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;
