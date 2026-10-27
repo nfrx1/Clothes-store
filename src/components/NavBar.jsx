@@ -2,7 +2,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Globe,
-  Menu,
   Search,
   ShoppingBag,
   User,
@@ -61,33 +60,6 @@ const NavBar = () => {
 
       <nav className="navbar bg-base-100/90 backdrop-blur-md border-b border-base-200 px-4 sm:px-8 lg:px-12 h-16 md:h-20 transition-all">
         <div className="navbar-start gap-1 sm:gap-2">
-          <div className="dropdown lg:hidden">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle btn-sm sm:btn-md"
-            >
-              <Menu size={20} strokeWidth={1.75} />
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-lg bg-base-100 rounded-box w-52 border border-base-200"
-            >
-              <li>
-                <a className="font-medium">New Arrivals</a>
-              </li>
-              <li>
-                <a className="font-medium">Men</a>
-              </li>
-              <li>
-                <a className="font-medium">Women</a>
-              </li>
-              <li>
-                <a className="font-medium text-error">Sale</a>
-              </li>
-            </ul>
-          </div>
-
           <button className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60">
             <User size={20} strokeWidth={1.75} />
           </button>
@@ -106,7 +78,7 @@ const NavBar = () => {
             href="/"
             className="text-xl sm:text-2xl md:text-3xl font-black tracking-[0.25em] uppercase cursor-pointer select-none"
           >
-            LOGO
+            NFRX
           </a>
         </div>
 

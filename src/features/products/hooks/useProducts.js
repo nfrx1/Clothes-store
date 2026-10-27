@@ -1,16 +1,25 @@
-export default async function useProducts(){
-    let loading = true;
-    let error = null
-    let results = null
-    try{
-        const response = await fetch("https://fakestoreapi.com/products")
-        results = response.json()
+import { useState, useEffect } from "react";
+
+export function useProducts() {
+  const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch("https://fakestoreapi.com/products");
+        const data = await response.json();
+        setResults(data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
     }
-    catch (err){
-        error = err
-    }
-    finally{
-        loading = false
-    }
-    return {results, loading, error}
+
+    fetchData();
+  }, []);
+
+  return { results, loading, error };
 }
