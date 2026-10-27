@@ -1,4 +1,3 @@
-```markdown
 # NFRX — Modern E-Commerce Store
 
 <div align="center">
@@ -60,7 +59,6 @@ src/
 │           └── useProducts.js
 ├── App.jsx
 └── main.jsx
-
 ```
 
 ---
@@ -74,34 +72,25 @@ Make sure you have **Node.js** (v18+ recommended) and **npm** installed on your 
 ### Installation
 
 1. **Clone the repository:**
-```bash
-git clone [https://github.com/nfrx1/Clothes-store.git](https://github.com/nfrx1/Clothes-store.git)
-cd Clothes-store
-
-```
-
+   ```bash
+   git clone [https://github.com/nfrx1/Clothes-store.git](https://github.com/nfrx1/Clothes-store.git)
+   cd Clothes-store
+   ```
 
 2. **Install dependencies:**
-```bash
-npm install
-
-```
-
+   ```bash
+   npm install
+   ```
 
 3. **Run the development server:**
-```bash
-npm run dev
-
-```
-
+   ```bash
+   npm run dev
+   ```
 
 4. **Build for production:**
-```bash
-npm run build
-
-```
-
-
+   ```bash
+   npm run build
+   ```
 
 ---
 
@@ -109,23 +98,18 @@ npm run build
 
 To test the **Log In** functionality with an existing account from Fake Store API, you can use:
 
-* **Username:** `mor_2314`
-* **Password:** `83r5^_`
+- **Username:** `mor_2314`
+- **Password:** `83r5^_`
 
 ---
 
 ## 👤 Author
 
 **Dawood Ali (NFRX)**
-
-* GitHub: [@nfrx1](https://github.com/nfrx1)
+- GitHub: [@nfrx1](https://github.com/nfrx1)
 
 ---
 
 ## 📄 License
 
-This project is open-source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
-
-```
-
-```
+This project is open-source and available under the [MIT License](LICENSE).
