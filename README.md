@@ -5,12 +5,20 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/DaisyUI-5A0EF8?style=for-the-badge&logo=daisyui&logoColor=white" alt="DaisyUI" />
   <img src="https://img.shields.io/badge/Zustand-State_Management-orange?style=for-the-badge" alt="Zustand" />
-  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+
+  <br /><br />
+
+  <a href="https://nfrxstore.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/Live_Demo-Visit_Store-blue?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo" />
+  </a>
 </div>
 
 <br />
 
 **NFRX** is a modern, minimalist e-commerce web application built with **React**, **Tailwind CSS**, and **DaisyUI**. Designed with an editorial aesthetic, it features a scalable feature-based architecture, responsive mobile-first layouts, real-time filtering, and centralized state management using **Zustand**.
+
+🔗 **Live URL:** [https://nfrxstore.vercel.app/](https://nfrxstore.vercel.app/)
 
 ---
 
@@ -21,12 +29,14 @@
 - **Instant Search & Category Filtering:** Zero-layout-shift inline navbar search combined with quick category pills and a responsive dropdown filter powered by Zustand.
 - **Authentication Flow:** Native HTML5 `<dialog>` modal system for user login and registration, integrated with Fake Store API and persisted securely in `sessionStorage`.
 - **Feature-Based Architecture:** Modular folder structure separating domain logic (`auth`, `products`) from shared UI components and layouts.
+- **Fast Production Deployment:** Deployed and optimized on Vercel edge infrastructure.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend Framework:** [React](https://react.dev/) (Vite)
+- **Deployment:** [Vercel](https://vercel.com/)
 - **Styling & UI Components:** [Tailwind CSS](https://tailwindcss.com/) + [DaisyUI](https://daisyui.com/)
 - **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) (with `sessionStorage` persistence)
 - **Icons:** [Lucide React](https://lucide.dev/)
