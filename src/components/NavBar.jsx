@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useFilter } from "../features/products/hooks/useFilter"
+import { useAuth } from "../features/auth/hooks/useAuth"
 
 const hookSentences = [
   "Get 20% OFF your first order – Code: WELCOME20",
@@ -20,7 +21,14 @@ const NavBar = () => {
   const [index, setIndex] = useState(0)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const setSearchQuery = useFilter((state) => state.setSearchQuery)
+  const isLoggedIn = useAuth((state) => state.isLoggedIn)
+  const openModal = useAuth((state) => state.openModal)
 
+  const handleAction = () => {
+    if (!isLoggedIn) {
+      openModal()
+    }
+  }
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((state) => (state < hookSentences.length - 1 ? state + 1 : 0))
@@ -96,6 +104,7 @@ const NavBar = () => {
           <>
             <div className="navbar-start w-auto flex-1 min-w-0 flex items-center gap-0.5 sm:gap-2">
               <button
+                onClick={handleAction}
                 aria-label="User account"
                 className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60"
               >
