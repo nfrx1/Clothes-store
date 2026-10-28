@@ -1,15 +1,36 @@
-import { ShoppingBag } from "lucide-react"
+import { Check, ShoppingBag } from "lucide-react"
+import { useState } from "react"
 import { useAuth } from "../../auth/hooks/useAuth"
+import { useCart } from "../../cart/useCart"
 
-const ProductCard = ({ title, description, imgUrl, category, price }) => {
+const ProductCard = ({ id, title, description, imgUrl, category, price }) => {
   const isLoggedIn = useAuth((state) => state.isLoggedIn)
   const openModal = useAuth((state) => state.openModal)
+  const addToCart = useCart((state) => state.addToCart)
+  const cartItem = useCart((state) =>
+    state.items.find((item) => item.id === id)
+  )
 
-  const handleAction = () => {
+  const [justAdded, setJustAdded] = useState(false)
+
+  const handleAction = async () => {
     if (!isLoggedIn) {
       openModal()
+      return
     }
+
+    setJustAdded(true)
+    await addToCart({
+      id,
+      title,
+      description,
+      image: imgUrl,
+      category,
+      price,
+    })
+    setTimeout(() => setJustAdded(false), 1000)
   }
+
   return (
     <article className="card bg-base-100 border border-base-200 hover:border-base-300 hover:shadow-xl transition-all duration-300 group overflow-hidden">
       <figure className="relative h-36 xs:h-44 sm:h-64 md:h-72 w-full bg-base-200/40 p-2.5 sm:p-6 overflow-hidden">
@@ -42,11 +63,24 @@ const ProductCard = ({ title, description, imgUrl, category, price }) => {
             ${price}
           </span>
           <button
-            className="btn btn-neutral btn-xs sm:btn-sm gap-1 sm:gap-2 px-2 sm:px-3"
+            className={`btn btn-xs sm:btn-sm gap-1 sm:gap-2 px-2 sm:px-3 ${
+              justAdded ? "btn-success text-success-content" : "btn-neutral"
+            }`}
             onClick={handleAction}
           >
-            <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="text-[11px] sm:text-xs">Add</span>
+            {justAdded ? (
+              <>
+                <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[11px] sm:text-xs">Added</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-[11px] sm:text-xs">
+                  Add{cartItem ? ` (${cartItem.quantity})` : ""}
+                </span>
+              </>
+            )}
           </button>
         </div>
       </div>

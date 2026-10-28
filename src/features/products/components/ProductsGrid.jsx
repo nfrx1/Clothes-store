@@ -57,6 +57,7 @@ const ProductsGrid = () => {
           {filteredItems.map((element) => (
             <ProductCard
               key={element.id}
+              id={element.id}
               title={element.title}
               description={element.description}
               imgUrl={element.image}

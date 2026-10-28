@@ -8,8 +8,10 @@ import {
   X,
 } from "lucide-react"
 import { useEffect, useState } from "react"
+import logoIcon from "../assets/icon.png"
 import { useFilter } from "../features/products/hooks/useFilter"
 import { useAuth } from "../features/auth/hooks/useAuth"
+import { useCart } from "../features/cart/useCart"
 
 const hookSentences = [
   "Get 20% OFF your first order – Code: WELCOME20",
@@ -24,11 +26,19 @@ const NavBar = () => {
   const isLoggedIn = useAuth((state) => state.isLoggedIn)
   const openModal = useAuth((state) => state.openModal)
 
+  const items = useCart((state) => state.items)
+  const isCartOpen = useCart((state) => state.isCartOpen)
+  const toggleCart = useCart((state) => state.toggleCart)
+  const closeCart = useCart((state) => state.closeCart)
+
+  const totalCartItems = items.reduce((sum, item) => sum + item.quantity, 0)
+
   const handleAction = () => {
     if (!isLoggedIn) {
       openModal()
     }
   }
+
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((state) => (state < hookSentences.length - 1 ? state + 1 : 0))
@@ -85,14 +95,17 @@ const NavBar = () => {
                 onKeyDown={(e) => e.key === "Escape" && setIsSearchOpen(false)}
                 placeholder="Search products, categories..."
                 className="input input-sm sm:input-md w-full pl-10 pr-4 bg-base-200/60 border-transparent focus:border-neutral focus:bg-base-100 rounded-full text-xs sm:text-sm transition-all"
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  if (isCartOpen) closeCart()
+                }}
               />
             </div>
 
             <button
               onClick={() => {
                 setIsSearchOpen(false)
-                setSearchQuery(!isSearchOpen ? setSearchQuery("") : "")
+                setSearchQuery("")
               }}
               aria-label="Close search"
               className="btn btn-ghost btn-sm sm:btn-md btn-circle shrink-0 hover:bg-base-200"
@@ -115,27 +128,44 @@ const NavBar = () => {
               </button>
 
               <button
+                onClick={toggleCart}
                 aria-label="Shopping bag"
-                className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60"
+                className={`btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60 ${
+                  isCartOpen ? "bg-base-200" : ""
+                }`}
               >
                 <div className="indicator">
                   <ShoppingBag
                     className="w-4.5 h-4.5 sm:w-5 sm:h-5"
                     strokeWidth={1.75}
                   />
-                  <span className="badge badge-xs badge-primary indicator-item font-bold text-[10px] px-1">
-                    3
-                  </span>
+                  {totalCartItems > 0 && (
+                    <span className="badge badge-xs badge-primary indicator-item font-bold text-[10px] px-1">
+                      {totalCartItems}
+                    </span>
+                  )}
                 </div>
               </button>
             </div>
 
-            <div className="navbar-center shrink-0 flex flex-col items-center px-2">
+            <div className="navbar-center shrink-0 flex items-center justify-center px-2">
               <a
                 href="/"
-                className="text-lg sm:text-2xl md:text-3xl font-black tracking-[0.15em] sm:tracking-[0.25em] mr-[-0.15em] sm:mr-[-0.25em] uppercase cursor-pointer select-none"
+                onClick={(e) => {
+                  e.preventDefault()
+                  closeCart()
+                }}
+                aria-label="NFRX Store Home"
+                className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer select-none group"
               >
-                NFRX
+                <img
+                  src={logoIcon}
+                  alt="NFRX Store Logo"
+                  className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 object-contain mix-blend-multiply shrink-0 group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="text-base sm:text-xl md:text-2xl font-black tracking-[0.15em] sm:tracking-[0.25em] mr-[-0.15em] sm:mr-[-0.25em] uppercase">
+                  NFRX
+                </span>
               </a>
             </div>
 
