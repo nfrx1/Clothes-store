@@ -4,7 +4,7 @@ import { useCart } from "../../cart/useCart"
 import { useAuth } from "../hooks/useAuth"
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
+  import.meta.env.VITE_API_URL || "https://nfrxstore-api.vercel.app"
 
 const AuthModal = () => {
   const login = useAuth((state) => state.login)

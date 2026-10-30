@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
+  import.meta.env.VITE_API_URL || "https://nfrxstore-api.vercel.app"
 
 export function useProducts() {
   const [results, setResults] = useState(null)

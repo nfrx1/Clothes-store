@@ -2,7 +2,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
+  import.meta.env.VITE_API_URL || "https://nfrxstore-api.vercel.app"
 
 export const useAuth = create(
   persist(
