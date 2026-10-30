@@ -1,25 +1,31 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react"
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
 
 export function useProducts() {
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [results, setResults] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("https://fakestoreapi.com/products");
-        const data = await response.json();
-        setResults(data);
+        const response = await fetch(`${API_URL}/api/products`)
+        if (!response.ok) {
+          throw new Error("Failed to load products")
+        }
+        const data = await response.json()
+        setResults(data)
       } catch (err) {
-        setError(err);
+        setError(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
-  return { results, loading, error };
+  return { results, loading, error }
 }

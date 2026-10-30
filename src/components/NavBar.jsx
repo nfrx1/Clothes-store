@@ -2,6 +2,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Globe,
+  LogOut,
   Search,
   ShoppingBag,
   User,
@@ -9,9 +10,9 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import logoIcon from "../assets/icon.png"
-import { useFilter } from "../features/products/hooks/useFilter"
 import { useAuth } from "../features/auth/hooks/useAuth"
 import { useCart } from "../features/cart/useCart"
+import { useFilter } from "../features/products/hooks/useFilter"
 
 const hookSentences = [
   "Get 20% OFF your first order – Code: WELCOME20",
@@ -24,7 +25,9 @@ const NavBar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const setSearchQuery = useFilter((state) => state.setSearchQuery)
   const isLoggedIn = useAuth((state) => state.isLoggedIn)
+  const user = useAuth((state) => state.user)
   const openModal = useAuth((state) => state.openModal)
+  const logout = useAuth((state) => state.logout)
 
   const items = useCart((state) => state.items)
   const isCartOpen = useCart((state) => state.isCartOpen)
@@ -116,16 +119,50 @@ const NavBar = () => {
         ) : (
           <>
             <div className="navbar-start w-auto flex-1 min-w-0 flex items-center gap-0.5 sm:gap-2">
-              <button
-                onClick={handleAction}
-                aria-label="User account"
-                className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60"
-              >
-                <User
-                  className="w-4.5 h-4.5 sm:w-5 sm:h-5"
-                  strokeWidth={1.75}
-                />
-              </button>
+              {isLoggedIn ? (
+                <details className="dropdown dropdown-start">
+                  <summary
+                    aria-label="User account"
+                    className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60"
+                  >
+                    <User
+                      className="w-4.5 h-4.5 sm:w-5 sm:h-5"
+                      strokeWidth={1.75}
+                    />
+                  </summary>
+                  <div className="dropdown-content bg-base-100 rounded-box z-50 w-48 p-3 shadow-xl border border-base-200 mt-2 space-y-2">
+                    <div className="px-1 pb-2 border-b border-base-200">
+                      <p className="text-xs font-bold truncate">
+                        {user?.username || "Account"}
+                      </p>
+                      {typeof user?.remainingOrders === "number" && (
+                        <p className="text-[11px] text-base-content/60">
+                          Orders left: {user.remainingOrders} / 2
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="btn btn-ghost btn-xs w-full justify-start text-error hover:bg-error/10 gap-2"
+                    >
+                      <LogOut size={14} />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                </details>
+              ) : (
+                <button
+                  onClick={handleAction}
+                  aria-label="User account"
+                  className="btn btn-ghost btn-circle btn-sm sm:btn-md hover:bg-base-200/60"
+                >
+                  <User
+                    className="w-4.5 h-4.5 sm:w-5 sm:h-5"
+                    strokeWidth={1.75}
+                  />
+                </button>
+              )}
 
               <button
                 onClick={toggleCart}

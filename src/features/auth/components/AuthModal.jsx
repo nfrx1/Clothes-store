@@ -1,9 +1,14 @@
 import { Lock, Mail, User, X } from "lucide-react"
 import { useState } from "react"
+import { useCart } from "../../cart/useCart"
 import { useAuth } from "../hooks/useAuth"
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
 
 const AuthModal = () => {
   const login = useAuth((state) => state.login)
+  const fetchCart = useCart((state) => state.fetchCart)
   const [isLoginView, setIsLoginView] = useState(false)
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -29,46 +34,41 @@ const AuthModal = () => {
     setError("")
 
     try {
-      if (isLoginView) {
-        const response = await fetch("https://fakestoreapi.com/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username,
-            password,
-          }),
-        })
+      const endpoint = isLoginView
+        ? `${API_URL}/api/auth/login`
+        : `${API_URL}/api/auth/register`
 
-        if (!response.ok) {
+      const payload = isLoginView
+        ? { username, password }
+        : { username, email, password }
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        if (response.status === 401) {
           throw new Error("Invalid username or password")
         }
-
-        const data = await response.json()
-        if (data.token) {
-          login(data.token)
-          resetForm()
+        if (response.status === 409) {
+          throw new Error("Username or email is already registered")
         }
-      } else {
-        const response = await fetch("https://fakestoreapi.com/users", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: 0,
-            username,
-            email,
-            password,
-          }),
-        })
+        throw new Error(
+          data.message ||
+            (isLoginView
+              ? "Invalid username or password"
+              : "Failed to create account"),
+        )
+      }
 
-        if (!response.ok) {
-          throw new Error("Failed to create account")
-        }
-
-        const data = await response.json()
-        if (data.id) {
-          login(`user-token-${data.id}`)
-          resetForm()
-        }
+      if (data.token) {
+        login(data.token, data.user || null)
+        resetForm()
+        fetchCart(data.user?.id || 1)
       }
     } catch (err) {
       setError(err.message || "Something went wrong")
@@ -102,7 +102,10 @@ const AuthModal = () => {
         </div>
 
         {error && (
-          <div role="alert" className="alert alert-error py-2 px-3 mb-4 text-xs sm:text-sm rounded-lg">
+          <div
+            role="alert"
+            className="alert alert-error py-2 px-3 mb-4 text-xs sm:text-sm rounded-lg"
+          >
             <span>{error}</span>
           </div>
         )}
@@ -175,7 +178,10 @@ const AuthModal = () => {
         </p>
       </div>
 
-      <form method="dialog" className="modal-backdrop bg-neutral/40 backdrop-blur-xs">
+      <form
+        method="dialog"
+        className="modal-backdrop bg-neutral/40 backdrop-blur-xs"
+      >
         <button onClick={resetForm}>close</button>
       </form>
     </dialog>

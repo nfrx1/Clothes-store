@@ -16,6 +16,7 @@ const CartSummary = () => {
   const syncing = useCart((state) => state.syncing)
 
   const isLoggedIn = useAuth((state) => state.isLoggedIn)
+  const user = useAuth((state) => state.user)
   const openModal = useAuth((state) => state.openModal)
 
   const [codeInput, setCodeInput] = useState("")
@@ -67,7 +68,6 @@ const CartSummary = () => {
         </span>
       </div>
 
-      {/* Free Shipping Progress */}
       <div className="bg-base-200/50 rounded-xl p-3 space-y-2">
         <div className="flex items-center gap-2 text-xs font-medium">
           <Truck size={15} className="shrink-0" />
@@ -89,7 +89,6 @@ const CartSummary = () => {
         />
       </div>
 
-      {/* Promo Code Input */}
       <div className="space-y-2">
         {promoCode ? (
           <div className="flex items-center justify-between bg-neutral/5 border border-base-300 rounded-lg px-3 py-2 text-xs">
@@ -141,7 +140,6 @@ const CartSummary = () => {
         )}
       </div>
 
-      {/* Price Breakdown */}
       <div className="space-y-2.5 text-xs sm:text-sm border-t border-base-200 pt-4">
         <div className="flex justify-between text-base-content/70">
           <span>Subtotal</span>
@@ -164,6 +162,15 @@ const CartSummary = () => {
           </span>
         </div>
 
+        {isLoggedIn && typeof user?.ordersCount === "number" && (
+          <div className="flex justify-between text-base-content/70">
+            <span>Account Orders Used</span>
+            <span className="font-semibold text-base-content">
+              {user.ordersCount} / 2
+            </span>
+          </div>
+        )}
+
         <div className="divider my-1"></div>
 
         <div className="flex justify-between items-baseline pt-1">
@@ -176,7 +183,6 @@ const CartSummary = () => {
         </div>
       </div>
 
-      {/* Checkout CTA */}
       <button
         type="button"
         onClick={handleCheckout}
@@ -195,7 +201,7 @@ const CartSummary = () => {
 
       <div className="flex items-center justify-center gap-2 text-[11px] text-base-content/50 pt-1">
         <ShieldCheck size={14} className="shrink-0" />
-        <span>Secure checkout powered by FakeStoreAPI</span>
+        <span>Secure checkout powered by NFRX</span>
       </div>
     </aside>
   )

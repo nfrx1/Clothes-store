@@ -24,7 +24,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (!hasInitialized) {
-      fetchCart(1)
+      fetchCart()
     }
   }, [hasInitialized, fetchCart])
 
@@ -32,7 +32,6 @@ const Cart = () => {
 
   return (
     <section className="max-w-7xl mx-auto px-3 sm:px-8 lg:px-12 py-6 sm:py-10 w-full">
-      {/* Top Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 sm:pb-6 mb-6 border-b border-base-200">
         <div className="flex items-center gap-3">
           <button
@@ -54,7 +53,7 @@ const Cart = () => {
               </span>
             </div>
             <p className="text-[11px] sm:text-xs text-base-content/60 mt-0.5">
-              Synced with FakeStoreAPI Cart Service
+              Synced with NFRX Store Service
             </p>
           </div>
         </div>
@@ -62,13 +61,13 @@ const Cart = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => fetchCart(1)}
+            onClick={() => fetchCart()}
             disabled={loading || syncing}
             className="btn btn-outline btn-xs sm:btn-sm border-base-300 gap-1.5"
-            title="Reload cart from FakeStoreAPI"
+            title="Reload cart from server"
           >
             <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-            <span className="text-xs">Sync API</span>
+            <span className="text-xs">Sync Bag</span>
           </button>
 
           {items.length > 0 && (
@@ -85,14 +84,12 @@ const Cart = () => {
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div role="alert" className="alert alert-error shadow-sm mb-6 text-xs sm:text-sm">
           <span>{error}</span>
         </div>
       )}
 
-      {/* Checkout Success Banner */}
       {orderSuccess && (
         <div
           role="alert"
@@ -103,7 +100,7 @@ const Cart = () => {
             <div>
               <h3 className="font-bold">Order Placed Successfully!</h3>
               <p className="text-xs opacity-90">
-                Your cart order was submitted to FakeStoreAPI. Thank you for shopping at NFRX.
+                Your order was submitted to NFRX Store. Thank you for shopping with us.
               </p>
             </div>
           </div>
@@ -117,7 +114,6 @@ const Cart = () => {
         </div>
       )}
 
-      {/* Loading Skeleton */}
       {loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           <div className="lg:col-span-8 space-y-4">

@@ -1,5 +1,9 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { useAuth } from "../auth/hooks/useAuth"
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://nfrxstore-api.vercel.app"
 
 export const useCart = create(
   persist(
@@ -15,32 +19,60 @@ export const useCart = create(
       discountPercent: 0,
       orderSuccess: false,
 
-      openCart: () => set({ isCartOpen: true, orderSuccess: false }),
-      closeCart: () => set({ isCartOpen: false, orderSuccess: false }),
+      openCart: () =>
+        set({ isCartOpen: true, orderSuccess: false, error: null }),
+      closeCart: () =>
+        set({ isCartOpen: false, orderSuccess: false, error: null }),
       toggleCart: () =>
-        set((state) => ({ isCartOpen: !state.isCartOpen, orderSuccess: false })),
+        set((state) => ({
+          isCartOpen: !state.isCartOpen,
+          orderSuccess: false,
+          error: null,
+        })),
 
-      fetchCart: async (userId = 1) => {
+      fetchCart: async (userId) => {
+        const { token, user } = useAuth.getState()
+        const targetId = userId || user?.id || 1
+
         set({ loading: true, error: null })
         try {
-          const response = await fetch(
-            `https://fakestoreapi.com/carts/${userId}`
-          )
+          const headers = token ? { Authorization: `Bearer ${token}` } : {}
+          const response = await fetch(`${API_URL}/api/carts/${targetId}`, {
+            headers,
+          })
+
           if (!response.ok) {
-            throw new Error("Failed to fetch cart from FakeStoreAPI")
+            throw new Error("Failed to fetch cart from server")
           }
 
           const cartData = await response.json()
-          const cartProducts = cartData?.products || []
 
+          if (Array.isArray(cartData?.items)) {
+            const currentItems = get().items
+            const nextItems =
+              cartData.items.length > 0 || !get().hasInitialized
+                ? cartData.items
+                : currentItems
+
+            set({
+              items: nextItems,
+              cartId: cartData?.id || targetId,
+              loading: false,
+              hasInitialized: true,
+              error: null,
+            })
+            return
+          }
+
+          const cartProducts = cartData?.products || []
           const detailedItems = await Promise.all(
             cartProducts.map(async (entry) => {
               const prodRes = await fetch(
-                `https://fakestoreapi.com/products/${entry.productId}`
+                `${API_URL}/api/products/${entry.productId}`,
               )
               if (!prodRes.ok) {
                 throw new Error(
-                  `Failed to fetch product #${entry.productId} details`
+                  `Failed to fetch product #${entry.productId} details`,
                 )
               }
               const product = await prodRes.json()
@@ -53,12 +85,12 @@ export const useCart = create(
                 image: product.image,
                 quantity: entry.quantity || 1,
               }
-            })
+            }),
           )
 
           set({
             items: detailedItems,
-            cartId: cartData?.id || userId,
+            cartId: cartData?.id || targetId,
             loading: false,
             hasInitialized: true,
             error: null,
@@ -73,19 +105,25 @@ export const useCart = create(
       },
 
       syncCartWithApi: async (updatedItems, method = "PUT") => {
+        const { token, user } = useAuth.getState()
+        if (!token) return
+
         const { cartId } = get()
         set({ syncing: true })
         try {
           const endpoint =
             method === "POST"
-              ? "https://fakestoreapi.com/carts"
-              : `https://fakestoreapi.com/carts/${cartId || 1}`
+              ? `${API_URL}/api/carts`
+              : `${API_URL}/api/carts/${cartId || user?.id || 1}`
 
           const response = await fetch(endpoint, {
             method,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
             body: JSON.stringify({
-              userId: 1,
+              userId: user?.id || 1,
               date: new Date().toISOString().split("T")[0],
               products: updatedItems.map((item) => ({
                 productId: item.id,
@@ -118,7 +156,7 @@ export const useCart = create(
           updatedItems = items.map((item, idx) =>
             idx === existingIndex
               ? { ...item, quantity: item.quantity + quantity }
-              : item
+              : item,
           )
         } else {
           updatedItems = [
@@ -135,14 +173,14 @@ export const useCart = create(
           ]
         }
 
-        set({ items: updatedItems, orderSuccess: false })
+        set({ items: updatedItems, orderSuccess: false, error: null })
         await syncCartWithApi(updatedItems, items.length === 0 ? "POST" : "PUT")
       },
 
       removeFromCart: async (productId) => {
         const { items, syncCartWithApi } = get()
         const updatedItems = items.filter((item) => item.id !== productId)
-        set({ items: updatedItems })
+        set({ items: updatedItems, error: null })
         await syncCartWithApi(updatedItems, "PUT")
       },
 
@@ -154,9 +192,9 @@ export const useCart = create(
         }
 
         const updatedItems = items.map((item) =>
-          item.id === productId ? { ...item, quantity } : item
+          item.id === productId ? { ...item, quantity } : item,
         )
-        set({ items: updatedItems })
+        set({ items: updatedItems, error: null })
         await syncCartWithApi(updatedItems, "PUT")
       },
 
@@ -176,15 +214,24 @@ export const useCart = create(
 
       clearCart: async () => {
         const { cartId } = get()
+        const { token, user } = useAuth.getState()
+
         set({
           items: [],
           promoCode: "",
           discountPercent: 0,
-          syncing: true,
+          error: null,
+          syncing: Boolean(token),
         })
+
+        if (!token) return
+
         try {
-          await fetch(`https://fakestoreapi.com/carts/${cartId || 1}`, {
+          await fetch(`${API_URL}/api/carts/${cartId || user?.id || 1}`, {
             method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           })
         } catch (err) {
           console.error("Failed to delete cart on server:", err)
@@ -207,26 +254,64 @@ export const useCart = create(
       },
 
       checkout: async () => {
-        const { items } = get()
+        const { items, promoCode } = get()
         if (items.length === 0) return false
 
-        set({ syncing: true, error: null })
+        const { token, isLoggedIn, openModal, logout, setUser } =
+          useAuth.getState()
+
+        if (!isLoggedIn || !token) {
+          set({ error: "Please log in to place an order." })
+          openModal()
+          return false
+        }
+
+        set({ syncing: true, error: null, orderSuccess: false })
         try {
-          const response = await fetch("https://fakestoreapi.com/carts", {
+          const response = await fetch(`${API_URL}/api/orders`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
             body: JSON.stringify({
-              userId: 1,
-              date: new Date().toISOString().split("T")[0],
               products: items.map((item) => ({
                 productId: item.id,
                 quantity: item.quantity,
               })),
+              promoCode: promoCode || null,
             }),
           })
 
+          const data = await response.json().catch(() => ({}))
+
           if (!response.ok) {
-            throw new Error("Checkout failed. Please try again.")
+            if (response.status === 401) {
+              logout()
+              openModal()
+              throw new Error("Please log in to place an order.")
+            }
+
+            if (
+              response.status === 403 ||
+              data.error === "OrderLimitExceeded"
+            ) {
+              setUser({ ordersCount: 2, remainingOrders: 0 })
+              throw new Error(
+                "Order limit reached: You cannot place more than 2 orders per account.",
+              )
+            }
+
+            throw new Error(
+              data.message || "Checkout failed. Please try again.",
+            )
+          }
+
+          if (typeof data.ordersCount === "number") {
+            setUser({
+              ordersCount: data.ordersCount,
+              remainingOrders: data.remainingOrders,
+            })
           }
 
           set({
@@ -235,6 +320,7 @@ export const useCart = create(
             discountPercent: 0,
             orderSuccess: true,
             syncing: false,
+            error: null,
           })
           return true
         } catch (err) {
@@ -252,7 +338,7 @@ export const useCart = create(
       getSubtotal: () =>
         get().items.reduce(
           (total, item) => total + Number(item.price) * item.quantity,
-          0
+          0,
         ),
     }),
     {
@@ -264,8 +350,8 @@ export const useCart = create(
         promoCode: state.promoCode,
         discountPercent: state.discountPercent,
       }),
-    }
-  )
+    },
+  ),
 )
 
 export default useCart

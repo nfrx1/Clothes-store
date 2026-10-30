@@ -34,12 +34,12 @@ const CartEmpty = () => {
 
         <button
           type="button"
-          onClick={() => fetchCart(1)}
+          onClick={() => fetchCart()}
           disabled={loading}
           className="btn btn-outline btn-sm sm:btn-md border-base-300 gap-2 w-full sm:w-auto"
         >
           <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-          <span>Load API Demo Cart</span>
+          <span>Sync Saved Bag</span>
         </button>
       </div>
     </div>
