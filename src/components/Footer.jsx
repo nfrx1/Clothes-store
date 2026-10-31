@@ -31,7 +31,7 @@ const Footer = () => {
           <FaTelegram />
         </a>
         <a
-          href="https://tiktok.com/@ynfd"
+          href="https://tiktok.com/@a"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="TikTok"
